@@ -1,0 +1,60 @@
+body {
+  background-color:black;
+  color:white;
+  font-family:monospace;
+  overflow:hidden;
+  margin:0;
+}
+
+#terminal-container {
+  position: absolute;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  overflow-y:hidden;
+  margin:5px;
+}
+
+#terminal {
+  max-height:100%;
+  overflow-wrap:normal;
+  overflow-y:scroll;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+p {
+  padding:0;
+  margin:0;
+}
+
+#user-input {
+  background-color:transparent;
+  color:white;
+  width:65%;
+  padding:0;
+  font-size:13px;
+  border-width:0;
+  border:none;
+  font-family:monospace;
+}
+
+#user-input:focus {
+  border:none;
+  outline:none;
+}
+
+a:link {
+  color:white;
+}
+
+a:visited {
+  color:rgb(219, 219, 219);
+}
+
+a:active {
+  color:white;
+}
