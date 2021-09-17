@@ -1,3 +1,17 @@
+var username = "guest";
+
+export function getUsername() {
+  return username;
+}
+
+export function setUsername(name) {
+  username = name;
+  let elements = document.getElementsByClassName('input-label');
+  for (let i=0; i < elements.length; i++) {
+    elements[i].innerText = username + "@jonahkowal";
+  }
+}
+
 function scrollDown() {
   if (terminal.scrollHeight - terminal.scrollTop - 100 <= terminal.clientHeight) {
     terminal.scroll(0, terminal.scrollHeight);
@@ -43,7 +57,7 @@ export function queryInput() {
     if (document.getElementById('user-input')) {
       reject();
     }
-    addLine("<font color='limegreen'>guest@jonahkowal</font>:~$ <input id='user-input' autocomplete='off' spellcheck='false'>");
+    addLine("<font class='input-label'>" + username + "@jonahkowal</font>:~$ <input id='user-input' autocomplete='off' spellcheck='false'>");
     scrollDown();
     let element = document.getElementById("user-input");
     element.focus();
@@ -63,12 +77,12 @@ export function queryInput() {
 export function interpretCommand(command) {
   return new Promise((resolve, reject)=>{
     let commandArray = command.split(" ");
-    let call = commandArray[0];
+    let call = commandArray[0].toLowerCase();
     commandArray.shift();
     let params = commandArray;
     import('./commands/' + call + '.js')
       .then(command => {
-        command.callCommand().then(resolve());
+        command.callCommand(params).then(()=>{resolve()}).catch((err) => {addColoredLine(err, "#FF0000").then(resolve())});
       })
       .catch(err => {
         commandNotFound(call).then(resolve());
@@ -78,6 +92,10 @@ export function interpretCommand(command) {
 
 function commandNotFound(command) {
   return new Promise((resolve, reject)=>{
+    if (command=="") {
+      resolve();
+      return;
+    }
     addColoredLine(command + ": command not found", "#FF0000").then(resolve());
   })
 }
@@ -118,4 +136,43 @@ export function addLoadingBar(timeScale=100, randomDiv=10, style="inline", id="l
       }
     }, timeScale);
   });
+}
+
+export function saveCookie(key, value) {
+  return new Promise((resolve, reject)=>{
+    document.cookie = key + "=" + value + ";";
+  })
+}
+
+export function loadCookie(key) {
+  return new Promise((resolve, reject)=>{
+    let name = key + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        resolve(c.substring(name.length, c.length));
+      }
+  }
+  resolve("");
+  });
+}
+
+export async function loadTheme() {
+  let backgroundColor = await loadCookie("background-color");
+  let color = await loadCookie("color");
+  let name = await loadCookie("username");
+  if (backgroundColor != "") {
+    document.getElementsByTagName('body')[0].style.backgroundColor = backgroundColor;
+  }
+  if (color != "") {
+    document.getElementsByTagName('body')[0].style.color = color;
+  }
+  if (name != "") {
+    username = name;
+  }
 }

@@ -4,6 +4,7 @@ body {
   font-family:monospace;
   overflow:hidden;
   margin:0;
+  font-size:large;
 }
 
 #terminal-container {
@@ -33,10 +34,10 @@ p {
 
 #user-input {
   background-color:transparent;
-  color:white;
-  width:65%;
+  color:inherit;
+  width:60%;
   padding:0;
-  font-size:13px;
+  font-size:inherit;
   border-width:0;
   border:none;
   font-family:monospace;
@@ -57,4 +58,8 @@ a:visited {
 
 a:active {
   color:white;
+}
+
+.input-label {
+  color:limegreen;
 }
