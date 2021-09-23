@@ -1,7 +1,14 @@
+import {getCurrentDir} from "./commandUtils.js";
 var username = "guest";
+var usernameColor = "limegreen";
 
 export function getUsername() {
   return username;
+}
+
+// TODO: give this function usage
+export function getUsernameColor() {
+  
 }
 
 export function setUsername(name) {
@@ -13,17 +20,24 @@ export function setUsername(name) {
 }
 
 function scrollDown() {
+  
   if (terminal.scrollHeight - terminal.scrollTop - 100 <= terminal.clientHeight) {
     terminal.scroll(0, terminal.scrollHeight);
   }
 }
 
-export function addLine(line = "<br>", id="") {
+export function addLine(line = "<br>", id="", cleanHTML=false, whitespaces=false) {
   return new Promise((resolve, reject)=>{
+    if (cleanHTML) {
+      line = line.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    }
     scrollDown();
     let newElement = document.createElement('p');
     newElement.id = id;
     newElement.innerHTML = line;
+    if (whitespaces) {
+      newElement.style = "white-space:break-spaces;";
+    }
     terminal.append(newElement);
     resolve();
   })
@@ -57,7 +71,7 @@ export function queryInput() {
     if (document.getElementById('user-input')) {
       reject();
     }
-    addLine("<font class='input-label'>" + username + "@jonahkowal</font>:~$ <input id='user-input' autocomplete='off' spellcheck='false'>");
+    addLine("<font class='input-label'>" + username + "@jonahkowal</font>:<font class='dir-label'>/"+getCurrentDir()+"</font>$ <input id='user-input' autocomplete='off' spellcheck='false'>");
     scrollDown();
     let element = document.getElementById("user-input");
     element.focus();
@@ -82,9 +96,16 @@ export function interpretCommand(command) {
     let params = commandArray;
     import('./commands/' + call + '.js')
       .then(command => {
-        command.callCommand(params).then(()=>{resolve()}).catch((err) => {addColoredLine(err, "#FF0000").then(resolve())});
+        command.callCommand(params).then(()=>{
+            resolve();
+        }).catch((err) => {
+          addColoredLine(err, "#FF0000").then(()=>{
+            resolve();
+          });
+        });
       })
       .catch(err => {
+        console.log("not found! " + err);
         commandNotFound(call).then(resolve());
       });
   })
@@ -157,8 +178,8 @@ export function loadCookie(key) {
       if (c.indexOf(name) == 0) {
         resolve(c.substring(name.length, c.length));
       }
-  }
-  resolve("");
+    }
+    resolve("");
   });
 }
 
